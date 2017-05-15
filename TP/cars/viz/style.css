@@ -1,0 +1,32 @@
+body { 
+	font-family: sans-serif; 
+}
+
+#croix_bleu{
+	color:steelblue;
+	font-size: 20px;
+}
+
+.legend_svg{
+	margin-left: 150px;
+	margin-top: 20px;
+	margin-bottom: -95px;
+
+}
+.legend_svg ul li {
+display : inline;
+padding : 0 0.5em; /* Pour espacer les boutons entre eux */
+}
+.legend_svg ul {
+list-style-type : none; /* Car sinon les puces se placent n'importe où */
+}
+
+h1{
+	margin-top: 0px;
+	margin-left: 300px;
+	font-size: 50px;
+}
+
+#voiture_deco{
+	margin-left: 175px;
+}

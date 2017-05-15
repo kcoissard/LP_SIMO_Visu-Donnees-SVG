@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Cars</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<script src="../vendor/d3/d3.js"></script>
+		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	</head>
+
+<body>
+<h1>Cars</h1>
+<div id="voiture_deco">
+	<svg width="365" height="185">
+	<!-- source pour le logo : http://codepen.io/yoksel/pen/vzBxp -->
+    <!-- Top -->
+      <rect x="70" y="10" width="220" height="130" fill="transparent" rx="150" stroke="crimson" stroke-width="10" />
+	    
+	    <!-- Body -->
+	      <rect x="10" y="70" width="340" height="80" fill="crimson" rx="30" />
+	      
+	    <g>
+	    <!-- Left line -->
+	      <line x1="145" y1="10" x2="145" y2="80" stroke="crimson" stroke-width="10"/>
+
+	    <!-- Right line -->
+	      <line x1="215" y1="10" x2="215" y2="80" stroke="crimson" stroke-width="10"/>
+	    </g>
+	  
+	    <g>
+	    <!-- Left bumper -->
+	      <rect x="0" y="110" width="40" height="20" fill="#999" rx="10" />
+	    
+	    <!-- Right bumper -->
+	      <rect x="325" y="110" width="40" height="20" fill="#999" rx="10" />
+	    </g>  
+	  
+	    <!-- Left wheel -->
+	    <g>
+	      <circle r="40px" fill="#222" stroke="white" stroke-width="7" cx="90" cy="140"/>    
+	      <circle r="15px" fill="#555" cx="90" cy="140"/>
+	    </g>
+	  
+	    <!-- Right wheel -->
+	    <g>
+	      <circle r="40px" fill="#222" stroke="white" stroke-width="7" cx="270" cy="140"/>
+	      <circle r="15px" fill="#555" cx="270" cy="140"/>
+	    </g>  
+
+	    <g>
+	    <!-- Gold light -->
+	      <circle r="15px" fill="gold" cx="340" cy="90"/>
+	      
+	    <!-- Orange light -->
+	      <circle r="10px" fill="orange" cx="15" cy="90"/>
+	    </g>  
+	</svg>
+</div>
+
+<!-- Legend rapide, je n'ai pas eu le temps de faire ça en Javascript -->
+<div class="legend_svg">
+	<ul><li>
+			Origin :
+		</li>
+		<li>
+			<svg width="10" height="10">
+			  <rect x="0"  y="0" width="10" height="10"
+			    stroke="steelBlue" fill="transparent" />
+			</svg>
+			Japan
+		</li>
+		<li>
+			<svg width="10" height="10">
+			  <circle cx="5" cy="5" r="5" width="10" height="10"
+			    stroke="steelBlue" fill="transparent" />
+			</svg>
+			USA
+		</li>
+		<li>
+			<span id="croix_bleu">x</span>
+			Europe
+		</li>
+</div>
+
+<script>
+
+	//MARGES SVG
+	var margin = {top:100, right:100, bottom:40, left:100};
+	width = 800 - margin.left - margin.right;
+	height = 600 - margin.top - margin.bottom;
+
+	//AXES
+	var x = d3.scaleLinear()
+	.range([0, width]);
+	var y = d3.scaleLinear()
+	.range([height, 0]);
+
+	//SVG
+	var svg = d3.select('body')
+	  .append('svg')
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	// CREE LES AXES X ET Y
+		var xAxis = d3.axisBottom(x)
+		.ticks(4);
+		var yAxis = d3.axisRight(y)
+		.ticks(4);
+
+	// AFFICHAGE DES POINTS
+	d3.tsv("../data/cars.tsv", function(error, data) {
+		if(error) throw error;
+
+	//GESTION DES COULEURS DES ELEMENTS
+	var couleurs = d3.scaleSequential(d3.interpolateBuPu);
+	function couleurElement(couleur){
+		switch (couleur)
+		{
+		   case "1970":return couleurs(0.25);
+		   case "1971":return couleurs(0.3);
+		   case "1972":return couleurs(0.35);
+		   case "1973":return couleurs(0.4);
+		   case "1974":return couleurs(0.45);
+		   case "1975":return couleurs(0.5);
+		   case "1976":return couleurs(0.55);
+		   case "1977":return couleurs(0.6);
+		   case "1979":return couleurs(0.7);
+		   case "1980":return couleurs(0.8);
+		   case "1981":return couleurs(0.9);
+		   default:return couleurs(1);
+		}
+	}
+
+	//VALS MIN ET MAX DES AXES
+	x.domain([0, d3.max(data, function(d) { return +d.weight; } )]).nice();
+	y.domain([1, d3.max(data, function(d) { return +d.mpg; } )]).nice();
+
+	//POSITION ET AFFICHAGE DES AXES
+	svg.append('g')
+	  .attr('class', 'x axis')
+		.attr("transform", "translate(0, " + height + ")")
+	  .call(xAxis);
+	svg.append('g')
+	  .attr('class', 'y axis')
+	  .call(yAxis);
+
+
+	//AFFICHAGE DES POINTS
+	var points = svg.selectAll('g')
+	.data(data)
+	.enter().append('g')
+	.attr('class', 'tooltip')
+	.attr("transform", function(d) {
+		return "translate(" + x(+d.weight) + ", " + y(+d.mpg) + ")";
+	})
+
+	//TITRE AU SURVOL DU POINT
+	points.append("title").attr("class", 'tooltiptext').html(function(d){
+		//affichage du titre au survol
+		//On vérifie que les données soient pas vides - sinon le title plante
+		var cylinder="empty-data";
+		var horsepower="empty-data";
+		var acceleration="empty-data";
+		var name="empty-data";
+		if(d.cylinders){cylinder=d.cylinders;}
+		if(d.horsepower){horsepower=d.horsepower;}
+		if(d.acceleration){acceleration=d.acceleration;}
+		if(d.name){name=d.name;}
+	
+		var titre = "Name:"+name + ", Cylinders: "+cylinder+", Horsepower:"+horsepower+", Acceleration:"+acceleration;
+	    return titre;
+	});
+
+	//FORME SELON L'ORIGIN DE LA VOITURE
+	//JAPON - rectangle
+	points.filter(function(d){
+		if( d.origin == "Japan") {
+			return true;
+		} else {
+			return false
+		}
+	}).append("rect").attr("fill","white").attr("width", 5).attr("height", 5).attr("x", -2.5).attr("y", -2.5).attr("class", function(d){
+		return "class_" + d["origin"];
+	}).attr("stroke", function(d){
+		couleurElement(d.year);
+		return couleurElement(d.year);
+	})
+	//USA - croix
+	points.filter(function(d){
+		if( d.origin == "USA") {
+			return true;
+		} else {
+			return false;
+		}
+
+	}).append("circle").attr("r", 2.8).attr("fill","white").attr("stroke", function(d){
+		couleurElement(d.year);
+		return couleurElement(d.year);
+	}).attr("class", function(d){
+		return "class_" + d["origin"];
+	});
+	//EUROPE - rond
+	points.filter(function(d){
+		if( d.origin == "Europe") {
+			return true;
+		} else {
+			return false;
+		}
+
+	}).append("path").attr("d", "M -4,0 L 4,0 M 0,-4 L 0,4").attr("stroke", function(d){
+		couleurElement(d.year);
+		return couleurElement(d.year);
+	}).attr("class", function(d){
+		return "class_" + d["origin"];
+	});
+});
+
+//DONNEES TEXTE
+d3.tsv("../data/cars.tsv", function(error, data) {
+	if(error) throw error;
+
+	d3.select("body").selectAll('div')
+    	.data(data)
+	  .enter().append('div')
+	    .text(function(d, i) {
+	    	var t = i + ". " + d.name + " (" +d.year + ", " + d.origin + ")";
+	    	return t;
+	    })
+
+});
+</script>
+</body>
+</html>

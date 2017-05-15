@@ -1,0 +1,79 @@
+<!DOCTYPE>
+<!-- BONHOMME TROP STYLÉ V1 -->
+<html>
+  <head>
+  <style type="text/css">
+      .white {
+        fill: white; /* not background-color! */
+        stroke: black; /* similar to border-color */
+        stroke-width: 3pt; /* similar to border-width */;
+      }
+    </style>
+  </head>
+
+  <body>
+    <svg width="300" height="180">
+      <g transform="translate(5, 15)"><!-- axe horizontal puis axe vertical -->
+        <text x="0" y="0">Howdy!</text><!-- x axe horizontal, y axe vertical -->
+      </g>
+
+      <g transform="translate(5, 55)">
+        <!-- M: move to (jump)
+             L: line to
+             Q: curve to (quadratic) -->
+
+             <!--
+             PREMIER POINT
+             M0 : point collé à gauche
+             0, point collé en haut
+
+             DEUXIEME POINT
+             L50 pixel horizontal "point de courbure" à parti duquel il faut courber
+             20 pixel vertical "point de courbure" à parti duquel il faut courber
+
+             TROISIEME POINT
+             Q100 -> deuxieme point de courbure horizontal
+             0 -> deuxieme point de courbure vertical
+
+             QUATRIEME POINT
+             100,50
+             -->
+        <path d="M0,50 L50,20 Q100,0 100,50" 
+          fill="red" stroke-width="3" stroke="black" />
+      </g>
+
+      <!-- sourcil gauche -->
+      <g transform="translate(20, 55)">
+        <path d="M0,30 L30,20 Q100,0 80,20" 
+          fill="black" stroke-width="3" stroke="black" />
+      </g>
+
+      <!-- oeil droit -->
+      <g transform="translate(60, 55)">
+        <path d="M50,50 L55,10 Q100,0 150,50" 
+          fill="red" stroke-width="3" stroke="black" />
+      </g>
+      
+      <!-- sourcil droit -->
+      <g transform="translate(75, 55)">
+        <path d="M30,20 L35,10 Q100,0 130,20" 
+          fill="blakc" stroke-width="3" stroke="black" />
+      </g>
+
+      <g transform="translate(45, 105)">
+        <!-- C: curve to (cubic)
+             Z: close shape -->
+        <path d="M0,100 C0,0 100,0 125,100 Z" fill="black" stroke-width="3" stroke="black" />
+      </g>
+
+        <!-- blanc de l'oeil gauche -->
+        <circle cx="80"  cy="90" r="10" class="white" />
+        <circle cx="80"  cy="90" r="2" class="white" />
+
+         <!-- blanc de l'oeil droite -->
+       <circle cx="140"  cy="90" r="10" class="white" />
+       <circle cx="140"  cy="90" r="2" class="white" />
+    </svg>
+  </body>
+</html>
+
